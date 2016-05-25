@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.rpham64.android.calmify"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
