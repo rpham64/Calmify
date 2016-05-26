@@ -20,9 +20,9 @@
         android:layout_height="match_parent"
         android:background="@drawable/fullscreen_bg_gradient">
 
-        <!-- Timer -->
+        <!-- Sleep Timer -->
         <TextView
-            android:id="@+id/timer"
+            android:id="@+id/sleep_timer"
             android:text="TIMER"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
