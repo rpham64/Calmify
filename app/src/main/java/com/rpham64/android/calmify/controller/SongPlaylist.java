@@ -15,6 +15,9 @@ import com.rpham64.android.calmify.ui.Song;
 import java.util.List;
 
 /**
+ * Displays a list of available songs to choose from.
+ * User can click on a list entry to play that song.
+ *
  * Created by Rudolf on 5/26/2016.
  */
 public class SongPlaylist extends Fragment{

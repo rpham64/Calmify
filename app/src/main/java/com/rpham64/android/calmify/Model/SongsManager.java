@@ -1,21 +1,60 @@
 package com.rpham64.android.calmify.model;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import com.rpham64.android.calmify.ui.Song;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Rudolf on 5/26/2016.
+ * Finds available songs and keeps track of them
  */
 public class SongsManager {
 
     private static final String TAG = "SongsManager";
 
-    private static final String SONGS_FOLDER = "raw";
-    private List<String> songs = new ArrayList<>();
+    private static final String SONGS_FOLDER = "music";
 
-    public SongsManager() {
+    private AssetManager mAssets;
+    private List<Song> mSongs = new ArrayList<>();
+
+    public SongsManager(Context context) {
+        mAssets = context.getAssets();
+        loadSongs();
+    }
+
+    private void loadSongs() {
+
+        String[] songNames;
+
+        try {
+
+            songNames = mAssets.list(SONGS_FOLDER);
+            Log.i(TAG, "Found " + songNames.length + " songs");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Add each sound in soundNames to mSounds
+        for (String filename : songNames) {
+
+            Log.i(TAG, "filename: " + filename);
+
+            String assetPath = SONGS_FOLDER + "/" + filename;
+            Song song = new Song(assetPath);
+            mSongs.add(song);
+
+        }
 
     }
 
-
+    public List<Song> getSongs() {
+        return mSongs;
+    }
 }

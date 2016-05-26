@@ -12,9 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
+import com.rpham64.android.calmify.model.SongsManager;
+import com.rpham64.android.calmify.ui.Song;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class CalmifyFragment extends Fragment {
 
     private MediaPlayer mMediaPlayer;
 
-    private List<Integer> songs;
+    private List<Song> songs;
     private int songIndex = 0;
 
     public static CalmifyFragment newInstance() {
@@ -45,13 +46,10 @@ public class CalmifyFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        songs = new ArrayList<>();
+        SongsManager songsManager = new SongsManager(getActivity());
+        songs = songsManager.getSongs();
 
-        songs.add(R.raw.ffx_to_zanarkand);
-        songs.add(R.raw.ffx_suteki_da_ne);
-        songs.add(R.raw.ffx2_memory_of_lightwaves);
-
-        mMediaPlayer = MediaPlayer.create(getActivity(), songs.get(songIndex));
+        mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setLooping(true);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -64,6 +62,7 @@ public class CalmifyFragment extends Fragment {
             }
         });
 
+        play(songIndex);
     }
 
     @Nullable
@@ -120,37 +119,26 @@ public class CalmifyFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Plays song at current index in songs list
+     *
+     * @param songIndex
+     */
     private void play(int songIndex) {
 
-        mMediaPlayer.reset();
+        try {
 
-        if (songIndex < songs.size()) {
+            String currentSong = songs.get(songIndex).getTitle();
+            AssetFileDescriptor afd =
+                    getActivity().getAssets().openFd("music/" + currentSong);
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+            afd.close();
 
-            try {
-
-                AssetFileDescriptor afd =
-                        getActivity().getResources().openRawResourceFd(songs.get(songIndex));
-
-                if (afd != null) {
-
-                    mMediaPlayer.setDataSource(
-                            afd.getFileDescriptor(),
-                            afd.getStartOffset(),
-                            afd.getLength());
-
-                    mMediaPlayer.prepare();
-                    afd.close();
-
-                    mMediaPlayer.start();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-            mMediaPlayer.release();
-            mMediaPlayer = null;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
