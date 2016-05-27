@@ -1,4 +1,4 @@
-package com.rpham64.android.calmify.controller;
+package com.rpham64.android.calmify.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
-import com.rpham64.android.calmify.ui.Song;
+import com.rpham64.android.calmify.model.Song;
 
 import java.util.List;
 

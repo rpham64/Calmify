@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
 import com.rpham64.android.calmify.model.SongsManager;
-import com.rpham64.android.calmify.ui.Song;
+import com.rpham64.android.calmify.model.Song;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,20 +50,29 @@ public class CalmifyFragment extends Fragment {
         songs = songsManager.getSongs();
 
         mMediaPlayer = new MediaPlayer();
+
+        // TODO: Create a "repeat" button that turns setLooping on/off
         mMediaPlayer.setLooping(true);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
 
-                songIndex = (songIndex + 1) % songs.size();
-                play(songIndex);
+                if (mMediaPlayer.isLooping()) {
+
+                    songIndex = (songIndex + 1) % songs.size();
+                    play();
+
+                } else {
+                    stop();
+                }
 
             }
         });
 
-        play(songIndex);
+        play();
     }
+
 
     @Nullable
     @Override
@@ -74,10 +83,12 @@ public class CalmifyFragment extends Fragment {
         mBackgroundImage = (ImageView) view.findViewById(R.id.background_image);
         mTimer = (TextView) view.findViewById(R.id.sleep_timer);
         mSongTitle = (TextView) view.findViewById(R.id.song_title);
-        mSongArtist = (TextView) view.findViewById(R.id.song_title);
+        mSongArtist = (TextView) view.findViewById(R.id.song_artist);
         mPrev = (ImageView) view.findViewById(R.id.prev);
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
+
+        updatePlayingInfo();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +100,8 @@ public class CalmifyFragment extends Fragment {
                     songIndex--;
                 }
 
-                play(songIndex);
-
+                updatePlayingInfo();
+                play();
             }
         });
 
@@ -99,9 +110,9 @@ public class CalmifyFragment extends Fragment {
             public void onClick(View v) {
 
                 if (!mMediaPlayer.isPlaying()) {
-                    mMediaPlayer.start();
+                    start();
                 } else {
-                    mMediaPlayer.pause();
+                    pause();
                 }
             }
         });
@@ -111,7 +122,9 @@ public class CalmifyFragment extends Fragment {
             public void onClick(View v) {
 
                 songIndex = (songIndex + 1) % songs.size();
-                play(songIndex);
+
+                updatePlayingInfo();
+                play();
 
             }
         });
@@ -120,26 +133,47 @@ public class CalmifyFragment extends Fragment {
     }
 
     /**
+     * Changes UI title and artist to current song's
+     *
+     */
+    private void updatePlayingInfo() {
+        mSongTitle.setText(songs.get(songIndex).getTitle().replace(".mp3", ""));
+        mSongArtist.setText(songs.get(songIndex).getArtist());
+    }
+
+    /**
      * Plays song at current index in songs list
      *
-     * @param songIndex
      */
-    private void play(int songIndex) {
+    private void play() {
 
         try {
 
-            String currentSong = songs.get(songIndex).getTitle();
+            String currentSong =
+                    songs.get(songIndex).getArtist() + '-' + songs.get(songIndex).getTitle();
             AssetFileDescriptor afd =
                     getActivity().getAssets().openFd("music/" + currentSong);
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             mMediaPlayer.prepare();
-            mMediaPlayer.start();
+            start();
             afd.close();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void start() {
+        mMediaPlayer.start();
+    }
+
+    private void pause() {
+        mMediaPlayer.pause();
+    }
+
+    private void stop() {
+        mMediaPlayer.stop();
     }
 
 }

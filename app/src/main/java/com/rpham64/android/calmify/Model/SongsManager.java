@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import com.rpham64.android.calmify.ui.Song;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
