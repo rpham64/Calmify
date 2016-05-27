@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/white"
                 android:fitsSystemWindows="true">
 
     <!-- Background Image -->
@@ -11,14 +10,13 @@
         android:id="@+id/background_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:contentDescription="Background Image"
+        android:scaleType="fitXY"
+        android:contentDescription="@string/background_image"
         />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/fullscreen_bg_gradient">
+        android:layout_height="match_parent">
 
         <!-- Sleep Timer -->
         <TextView
@@ -39,7 +37,11 @@
             android:layout_above="@+id/song_artist"
             android:gravity="center_horizontal"
             android:layout_centerInParent="true"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            android:textSize="30sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white"/>
 
         <!-- Song Artist -->
         <TextView
@@ -49,7 +51,12 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_centerInParent="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:fontFamily="sans-serif-light"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            android:textSize="24sp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/gray"/>
 
     </RelativeLayout>
 
@@ -81,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_play_button"
+                android:src="@drawable/ic_pause_button"
                 android:contentDescription="@string/play_pause_song"/>
 
             <ImageView

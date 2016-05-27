@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
-import com.rpham64.android.calmify.model.SongsManager;
 import com.rpham64.android.calmify.model.Song;
+import com.rpham64.android.calmify.model.SongsManager;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,32 +47,32 @@ public class CalmifyFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
         SongsManager songsManager = new SongsManager(getActivity());
         songs = songsManager.getSongs();
 
         mMediaPlayer = new MediaPlayer();
 
+        play();
+
         // TODO: Create a "repeat" button that turns setLooping on/off
-        mMediaPlayer.setLooping(true);
+//        mMediaPlayer.setLooping(true);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
 
-                if (mMediaPlayer.isLooping()) {
+                Log.i(TAG, "Music finished. Playing next song.");
 
-                    songIndex = (songIndex + 1) % songs.size();
-                    play();
+                songIndex = (songIndex + 1) % songs.size();
 
-                } else {
-                    stop();
-                }
-
+                updatePlayingInfo();
+                play();
             }
         });
 
-        play();
+
     }
 
 
@@ -88,6 +90,7 @@ public class CalmifyFragment extends Fragment {
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
 
+        updateBackground();
         updatePlayingInfo();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
@@ -111,8 +114,10 @@ public class CalmifyFragment extends Fragment {
 
                 if (!mMediaPlayer.isPlaying()) {
                     start();
+                    mPlay.setImageResource(R.drawable.ic_pause_button);
                 } else {
                     pause();
+                    mPlay.setImageResource(R.drawable.ic_play_button);
                 }
             }
         });
@@ -132,6 +137,13 @@ public class CalmifyFragment extends Fragment {
         return view;
     }
 
+    private void updateBackground() {
+        Picasso.with(getActivity())
+                .load("https://wallpaperscraft.com/image/taiwan_taipei_republic_of_china_skyscraper_city_view_evening_sunset_lights_buildings_88178_1080x1920.jpg")
+                .placeholder(R.color.white)
+                .into(mBackgroundImage);
+    }
+
     /**
      * Changes UI title and artist to current song's
      *
@@ -139,6 +151,7 @@ public class CalmifyFragment extends Fragment {
     private void updatePlayingInfo() {
         mSongTitle.setText(songs.get(songIndex).getTitle().replace(".mp3", ""));
         mSongArtist.setText(songs.get(songIndex).getArtist());
+        mPlay.setImageResource(R.drawable.ic_pause_button);
     }
 
     /**

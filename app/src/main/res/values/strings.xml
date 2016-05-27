@@ -3,4 +3,5 @@
     <string name="prev_song">Prev song</string>
     <string name="play_pause_song">Play</string>
     <string name="next_song">Next song</string>
+    <string name="background_image">Background Image</string>
 </resources>

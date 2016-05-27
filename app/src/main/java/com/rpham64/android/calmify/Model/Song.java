@@ -11,7 +11,7 @@ public class Song {
 
     private final String TAG = "Song";
 
-    private String mAssetPath;
+    private String mAssetPath;      // Uri: "music/filename.mp3"
     private String mTitle;
     private String mArtist;
 
