@@ -15,9 +15,9 @@ import android.widget.TextView;
 import com.rpham64.android.calmify.R;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,6 +35,8 @@ public class CalmifyFragment extends Fragment {
     private ImageView mPlay;
     private ImageView mNext;
 
+    private HashMap<Integer, Integer> images = new HashMap<>();
+
     private MediaPlayer mMediaPlayer;
 
     private List<Song> songs;
@@ -48,6 +50,10 @@ public class CalmifyFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        images.put(0, R.drawable.taipei101);
+        images.put(1, R.drawable.el_nido_milky_way);
+        images.put(2, R.drawable.ipw954av999);
 
         SongsManager songsManager = new SongsManager(getActivity());
         songs = songsManager.getSongs();
@@ -72,7 +78,6 @@ public class CalmifyFragment extends Fragment {
             }
         });
 
-
     }
 
 
@@ -90,20 +95,29 @@ public class CalmifyFragment extends Fragment {
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
 
-        updateBackground();
+        if (!mMediaPlayer.isPlaying()) {
+            mPlay.setImageResource(R.drawable.ic_play_button);
+        }
+
         updatePlayingInfo();
+        updateBackground();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (songIndex == 0) {
-                    songIndex = songs.size() - 1;
-                } else {
-                    songIndex--;
+                switch (songIndex) {
+
+                    case 0:
+                        songIndex = songs.size() - 1;
+                        break;
+                    default:
+                        songIndex--;
+
                 }
 
                 updatePlayingInfo();
+                updateBackground();
                 play();
             }
         });
@@ -113,11 +127,11 @@ public class CalmifyFragment extends Fragment {
             public void onClick(View v) {
 
                 if (!mMediaPlayer.isPlaying()) {
-                    start();
                     mPlay.setImageResource(R.drawable.ic_pause_button);
+                    start();
                 } else {
-                    pause();
                     mPlay.setImageResource(R.drawable.ic_play_button);
+                    pause();
                 }
             }
         });
@@ -129,6 +143,7 @@ public class CalmifyFragment extends Fragment {
                 songIndex = (songIndex + 1) % songs.size();
 
                 updatePlayingInfo();
+                updateBackground();
                 play();
 
             }
@@ -138,10 +153,7 @@ public class CalmifyFragment extends Fragment {
     }
 
     private void updateBackground() {
-        Picasso.with(getActivity())
-                .load("https://wallpaperscraft.com/image/taiwan_taipei_republic_of_china_skyscraper_city_view_evening_sunset_lights_buildings_88178_1080x1920.jpg")
-                .placeholder(R.color.white)
-                .into(mBackgroundImage);
+        mBackgroundImage.setImageResource(images.get(songIndex));
     }
 
     /**
