@@ -20,9 +20,9 @@ public class Song {
 
         // Extract file name from asset path
         String[] components = assetPath.split("/");
-        String songInfo = components[components.length - 1];
-        mArtist = songInfo.substring(0, songInfo.indexOf('-'));
-        mTitle = songInfo.substring(songInfo.indexOf('-') + 1);
+        String songInfo = components[components.length - 1];        // "Artist-Title.mp3"
+        mArtist = songInfo.substring(0, songInfo.indexOf('-') - 1);
+        mTitle = songInfo.substring(songInfo.indexOf('-') + 2);
 
         Log.i(TAG, "Artist: " + mArtist);
         Log.i(TAG, "Title: " + mTitle);

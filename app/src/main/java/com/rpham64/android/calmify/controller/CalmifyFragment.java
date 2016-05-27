@@ -39,7 +39,8 @@ public class CalmifyFragment extends Fragment {
 
     private MediaPlayer mMediaPlayer;
 
-    private List<Song> songs;
+    private SongsManager mSongsManager;
+    private List<Song> mSongs;
     private int songIndex = 0;
 
     public static CalmifyFragment newInstance() {
@@ -51,12 +52,16 @@ public class CalmifyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        images.put(0, R.drawable.taipei101);
-        images.put(1, R.drawable.el_nido_milky_way);
-        images.put(2, R.drawable.ipw954av999);
+        // Map images to corresponding songIndex
+        // Used for displaying a new image for each song
+        images.put(0, R.drawable.new_york);
+        images.put(1, R.drawable.san_francisco);
+        images.put(2, R.drawable.hong_kong);
+        images.put(3, R.drawable.taipei101);
+        images.put(4, R.drawable.tokyo);
 
-        SongsManager songsManager = new SongsManager(getActivity());
-        songs = songsManager.getSongs();
+        mSongsManager = new SongsManager(getActivity());
+        mSongs = mSongsManager.getSongs();
 
         mMediaPlayer = new MediaPlayer();
 
@@ -71,9 +76,9 @@ public class CalmifyFragment extends Fragment {
 
                 Log.i(TAG, "Music finished. Playing next song.");
 
-                songIndex = (songIndex + 1) % songs.size();
+                songIndex = (songIndex + 1) % mSongs.size();
 
-                updatePlayingInfo();
+                updateSongUI();
                 play();
             }
         });
@@ -95,11 +100,12 @@ public class CalmifyFragment extends Fragment {
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
 
+        // MediaPlayer not playing => Set "play" button
         if (!mMediaPlayer.isPlaying()) {
             mPlay.setImageResource(R.drawable.ic_play_button);
         }
 
-        updatePlayingInfo();
+        updateSongUI();
         updateBackground();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
@@ -109,14 +115,14 @@ public class CalmifyFragment extends Fragment {
                 switch (songIndex) {
 
                     case 0:
-                        songIndex = songs.size() - 1;
+                        songIndex = mSongs.size() - 1;
                         break;
                     default:
                         songIndex--;
 
                 }
 
-                updatePlayingInfo();
+                updateSongUI();
                 updateBackground();
                 play();
             }
@@ -140,9 +146,9 @@ public class CalmifyFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                songIndex = (songIndex + 1) % songs.size();
+                songIndex = (songIndex + 1) % mSongs.size();
 
-                updatePlayingInfo();
+                updateSongUI();
                 updateBackground();
                 play();
 
@@ -152,30 +158,34 @@ public class CalmifyFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Changes title and artist to current song's
+     *
+     */
+    private void updateSongUI() {
+        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".mp3", ""));
+        mSongArtist.setText(mSongs.get(songIndex).getArtist());
+    }
+
+    /**
+     * Changes background image
+     */
     private void updateBackground() {
         mBackgroundImage.setImageResource(images.get(songIndex));
     }
 
     /**
-     * Changes UI title and artist to current song's
-     *
-     */
-    private void updatePlayingInfo() {
-        mSongTitle.setText(songs.get(songIndex).getTitle().replace(".mp3", ""));
-        mSongArtist.setText(songs.get(songIndex).getArtist());
-        mPlay.setImageResource(R.drawable.ic_pause_button);
-    }
-
-    /**
-     * Plays song at current index in songs list
+     * Plays song at current index in mSongs list
      *
      */
     private void play() {
 
+        Log.i(TAG, "Now playing.");
+
         try {
 
             String currentSong =
-                    songs.get(songIndex).getArtist() + '-' + songs.get(songIndex).getTitle();
+                    mSongs.get(songIndex).getArtist() + " - " + mSongs.get(songIndex).getTitle();
             AssetFileDescriptor afd =
                     getActivity().getAssets().openFd("music/" + currentSong);
             mMediaPlayer.reset();
@@ -187,6 +197,9 @@ public class CalmifyFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // MediaPlayer playing => Set "pause" button
+        mPlay.setImageResource(R.drawable.ic_pause_button);
     }
 
     private void start() {
