@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/song_title"
             android:gravity="center"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true"
+            android:visibility="invisible"/>
 
         <!-- Song Title -->
         <TextView

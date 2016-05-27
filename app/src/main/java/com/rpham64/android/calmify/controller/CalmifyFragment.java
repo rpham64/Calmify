@@ -78,13 +78,23 @@ public class CalmifyFragment extends Fragment {
 
                 songIndex = (songIndex + 1) % mSongs.size();
 
-                updateSongUI();
+                updateUI();
                 play();
             }
         });
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        View decorView = getActivity().getWindow().getDecorView();
+
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 
     @Nullable
     @Override
@@ -102,28 +112,22 @@ public class CalmifyFragment extends Fragment {
 
         // MediaPlayer not playing => Set "play" button
         if (!mMediaPlayer.isPlaying()) {
-            mPlay.setImageResource(R.drawable.ic_play_button);
+            setPlayButton();
         }
 
-        updateSongUI();
-        updateBackground();
+        updateUI();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                switch (songIndex) {
+                songIndex--;
 
-                    case 0:
-                        songIndex = mSongs.size() - 1;
-                        break;
-                    default:
-                        songIndex--;
+                if (songIndex < 0) songIndex += mSongs.size();
 
-                }
+                updateUI();
+                setPausedButton();
 
-                updateSongUI();
-                updateBackground();
                 play();
             }
         });
@@ -133,10 +137,10 @@ public class CalmifyFragment extends Fragment {
             public void onClick(View v) {
 
                 if (!mMediaPlayer.isPlaying()) {
-                    mPlay.setImageResource(R.drawable.ic_pause_button);
+                    setPausedButton();
                     start();
                 } else {
-                    mPlay.setImageResource(R.drawable.ic_play_button);
+                    setPlayButton();
                     pause();
                 }
             }
@@ -148,8 +152,9 @@ public class CalmifyFragment extends Fragment {
 
                 songIndex = (songIndex + 1) % mSongs.size();
 
-                updateSongUI();
-                updateBackground();
+                updateUI();
+                setPausedButton();
+
                 play();
 
             }
@@ -159,18 +164,26 @@ public class CalmifyFragment extends Fragment {
     }
 
     /**
-     * Changes title and artist to current song's
-     *
+     * Sets play/pause button to PLAY
      */
-    private void updateSongUI() {
-        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".mp3", ""));
-        mSongArtist.setText(mSongs.get(songIndex).getArtist());
+    private void setPlayButton() {
+        mPlay.setImageResource(R.drawable.ic_play_button);
     }
 
     /**
-     * Changes background image
+     * Sets play/pause button to PAUSE
      */
-    private void updateBackground() {
+    private void setPausedButton() {
+        mPlay.setImageResource(R.drawable.ic_pause_button);
+    }
+
+    /**
+     * Changes title, artist, and background image to current song's
+     *
+     */
+    private void updateUI() {
+        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".mp3", ""));
+        mSongArtist.setText(mSongs.get(songIndex).getArtist());
         mBackgroundImage.setImageResource(images.get(songIndex));
     }
 
@@ -198,8 +211,6 @@ public class CalmifyFragment extends Fragment {
             e.printStackTrace();
         }
 
-        // MediaPlayer playing => Set "pause" button
-        mPlay.setImageResource(R.drawable.ic_pause_button);
     }
 
     private void start() {
