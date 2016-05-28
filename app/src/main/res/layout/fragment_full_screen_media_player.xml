@@ -5,7 +5,6 @@
                 android:fitsSystemWindows="true">
 
     <!-- Background Image -->
-    <!-- TODO: Figure out if this can be replaced with an animation -->
     <pl.droidsonroids.gif.GifImageView
         android:id="@+id/background_image"
         android:layout_width="match_parent"
@@ -35,7 +34,6 @@
             android:text="SONG TITLE"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/song_artist"
             android:gravity="center_horizontal"
             android:layout_centerInParent="true"
             android:shadowColor="@android:color/black"
@@ -45,7 +43,7 @@
             android:textColor="@color/white"/>
 
         <!-- Song Artist -->
-        <TextView
+        <!--<TextView
             android:text="SONG ARTIST"
             android:id="@+id/song_artist"
             android:layout_width="match_parent"
@@ -57,7 +55,7 @@
             android:shadowRadius="20"
             android:textSize="24sp"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/gray"/>
+            android:textColor="@color/gray"/>-->
 
     </RelativeLayout>
 

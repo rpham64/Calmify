@@ -33,7 +33,6 @@ public class CalmifyFragment extends Fragment {
     private GifImageView mBackgroundImage;
     private TextView mTimer;
     private TextView mSongTitle;
-    private TextView mSongArtist;
     private ImageView mPrev;
     private ImageView mPlay;
     private ImageView mNext;
@@ -55,17 +54,11 @@ public class CalmifyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        // Map images to corresponding songIndex
-        // Used for displaying a new image for each song
-//        images.put(0, R.drawable.new_york);
-//        images.put(1, R.drawable.san_francisco);
-//        images.put(2, R.drawable.hong_kong);
-//        images.put(3, R.drawable.taipei101);
-//        images.put(4, R.drawable.tokyo);
-
-        images.put(0, R.drawable.japan1);
-        images.put(1, R.drawable.japan2);
-        images.put(2, R.drawable.japan3);
+        // Map songIndex to corresponding gifs
+        // Used for displaying a new live wallpaper for each song
+        images.put(0, R.drawable.coffee);
+        images.put(1, R.drawable.fall);
+        images.put(2, R.drawable.rain);
         images.put(3, R.drawable.japan4);
         images.put(4, R.drawable.japan5);
 
@@ -77,17 +70,11 @@ public class CalmifyFragment extends Fragment {
         play();
 
         // TODO: Create a "repeat" button that turns setLooping on/off
-//        mMediaPlayer.setLooping(true);
+        mMediaPlayer.setLooping(true);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-
-                Log.i(TAG, "Music finished. Playing next song.");
-
-                songIndex = (songIndex + 1) % mSongs.size();
-
-                updateUI();
                 play();
             }
         });
@@ -98,6 +85,10 @@ public class CalmifyFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        hideStatusBar();
+    }
+
+    private void hideStatusBar() {
         View decorView = getActivity().getWindow().getDecorView();
 
         // Hide the status bar.
@@ -114,7 +105,6 @@ public class CalmifyFragment extends Fragment {
         mBackgroundImage = (GifImageView) view.findViewById(R.id.background_image);
         mTimer = (TextView) view.findViewById(R.id.sleep_timer);
         mSongTitle = (TextView) view.findViewById(R.id.song_title);
-        mSongArtist = (TextView) view.findViewById(R.id.song_artist);
         mPrev = (ImageView) view.findViewById(R.id.prev);
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
@@ -191,8 +181,7 @@ public class CalmifyFragment extends Fragment {
      *
      */
     private void updateUI() {
-        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".mp3", ""));
-        mSongArtist.setText(mSongs.get(songIndex).getArtist());
+        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".ogg", ""));
 
         // Image
         mBackgroundImage.setImageResource(images.get(songIndex));
@@ -204,16 +193,15 @@ public class CalmifyFragment extends Fragment {
 
     /**
      * Plays song at current index in mSongs list
-     *
      */
     private void play() {
 
-        Log.i(TAG, "Now playing.");
-
         try {
 
-            String currentSong =
-                    mSongs.get(songIndex).getArtist() + " - " + mSongs.get(songIndex).getTitle();
+            String currentSong = mSongs.get(songIndex).getTitle();
+
+            Log.i(TAG, "Now playing: " + currentSong);
+
             AssetFileDescriptor afd =
                     getActivity().getAssets().openFd("music/" + currentSong);
             mMediaPlayer.reset();
@@ -224,6 +212,10 @@ public class CalmifyFragment extends Fragment {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (mMediaPlayer.isLooping()) {
+            mMediaPlayer.setNextMediaPlayer(mMediaPlayer);
         }
 
     }
