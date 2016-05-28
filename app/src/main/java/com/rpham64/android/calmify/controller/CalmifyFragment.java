@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 /**
  * Created by Rudolf on 5/24/2016.
  */
@@ -27,7 +30,7 @@ public class CalmifyFragment extends Fragment {
 
     private static final String TAG = "CalmifyFragment";
 
-    private ImageView mBackgroundImage;
+    private GifImageView mBackgroundImage;
     private TextView mTimer;
     private TextView mSongTitle;
     private TextView mSongArtist;
@@ -54,11 +57,17 @@ public class CalmifyFragment extends Fragment {
 
         // Map images to corresponding songIndex
         // Used for displaying a new image for each song
-        images.put(0, R.drawable.new_york);
-        images.put(1, R.drawable.san_francisco);
-        images.put(2, R.drawable.hong_kong);
-        images.put(3, R.drawable.taipei101);
-        images.put(4, R.drawable.tokyo);
+//        images.put(0, R.drawable.new_york);
+//        images.put(1, R.drawable.san_francisco);
+//        images.put(2, R.drawable.hong_kong);
+//        images.put(3, R.drawable.taipei101);
+//        images.put(4, R.drawable.tokyo);
+
+        images.put(0, R.drawable.japan1);
+        images.put(1, R.drawable.japan2);
+        images.put(2, R.drawable.japan3);
+        images.put(3, R.drawable.japan4);
+        images.put(4, R.drawable.japan5);
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
@@ -102,7 +111,7 @@ public class CalmifyFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_full_screen_media_player, container, false);
 
-        mBackgroundImage = (ImageView) view.findViewById(R.id.background_image);
+        mBackgroundImage = (GifImageView) view.findViewById(R.id.background_image);
         mTimer = (TextView) view.findViewById(R.id.sleep_timer);
         mSongTitle = (TextView) view.findViewById(R.id.song_title);
         mSongArtist = (TextView) view.findViewById(R.id.song_artist);
@@ -184,7 +193,13 @@ public class CalmifyFragment extends Fragment {
     private void updateUI() {
         mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".mp3", ""));
         mSongArtist.setText(mSongs.get(songIndex).getArtist());
+
+        // Image
         mBackgroundImage.setImageResource(images.get(songIndex));
+
+        // Gif
+        GifDrawable gifDrawable = (GifDrawable) mBackgroundImage.getDrawable();
+        gifDrawable.start();
     }
 
     /**
