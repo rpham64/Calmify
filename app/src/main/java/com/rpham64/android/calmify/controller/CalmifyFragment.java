@@ -2,6 +2,7 @@ package com.rpham64.android.calmify.controller;
 
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -58,9 +59,9 @@ public class CalmifyFragment extends Fragment {
         // Used for displaying a new live wallpaper for each song
         images.put(0, R.drawable.coffee);
         images.put(1, R.drawable.fall);
-        images.put(2, R.drawable.rain);
-        images.put(3, R.drawable.japan4);
-        images.put(4, R.drawable.japan5);
+        images.put(2, R.drawable.snow);
+        images.put(3, R.drawable.rain);
+        images.put(4, R.drawable.stream);
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
@@ -85,14 +86,18 @@ public class CalmifyFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        hideStatusBar();
+        if (Build.VERSION.SDK_INT >= 19) {
+            hideStatusAndNavigationBars();
+        }
+
     }
 
-    private void hideStatusBar() {
+    private void hideStatusAndNavigationBars() {
         View decorView = getActivity().getWindow().getDecorView();
 
-        // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        // Hide the status and navigation bars.
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
     }
 
