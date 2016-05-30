@@ -58,11 +58,14 @@ public class CalmifyFragment extends Fragment {
         // Map songIndex to corresponding gifs
         // Used for displaying a new live wallpaper for each song
         images.put(0, R.drawable.coffee);
-        images.put(1, R.drawable.fall);
-        images.put(2, R.drawable.snow);
-        images.put(3, R.drawable.rain);
-        images.put(4, R.drawable.summer_beach);
-        images.put(5, R.drawable.stream);
+        images.put(1, R.drawable.rain);
+        images.put(2, R.drawable.fall);
+        images.put(3, R.drawable.snow);
+        images.put(4, R.drawable.lake_nature);
+        images.put(5, R.drawable.aurora);
+        images.put(6, R.drawable.clouds_over_himalayas);
+        images.put(7, R.drawable.fireflies_fall);
+        images.put(8, R.drawable.snow_in_dark);
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
@@ -187,7 +190,13 @@ public class CalmifyFragment extends Fragment {
      *
      */
     private void updateUI() {
-        mSongTitle.setText(mSongs.get(songIndex).getTitle().replace(".ogg", ""));
+
+        // "#song.mp3" -> "song"
+        mSongTitle.setText(
+                mSongs.get(songIndex).getTitle()
+                        .substring(1)               // Remove song #
+                        .replace(".ogg", "")        // Remove file extension
+        );
 
         // Image
         mBackgroundImage.setImageResource(images.get(songIndex));
@@ -206,7 +215,7 @@ public class CalmifyFragment extends Fragment {
 
             String currentSong = mSongs.get(songIndex).getTitle();
 
-            Log.i(TAG, "Now playing: " + currentSong);
+            Log.i(TAG, "Now playing: " + currentSong.substring(1));
 
             AssetFileDescriptor afd =
                     getActivity().getAssets().openFd("music/" + currentSong);
