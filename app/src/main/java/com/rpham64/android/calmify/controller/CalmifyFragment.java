@@ -61,7 +61,8 @@ public class CalmifyFragment extends Fragment {
         images.put(1, R.drawable.fall);
         images.put(2, R.drawable.snow);
         images.put(3, R.drawable.rain);
-        images.put(4, R.drawable.stream);
+        images.put(4, R.drawable.summer_beach);
+        images.put(5, R.drawable.stream);
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
