@@ -33,7 +33,7 @@
         <TextView
             android:id="@+id/song_title"
             android:text="SONG TITLE"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="sans-serif-thin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"

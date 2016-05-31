@@ -63,9 +63,13 @@ public class CalmifyFragment extends Fragment {
         images.put(3, R.drawable.snow);
         images.put(4, R.drawable.lake_nature);
         images.put(5, R.drawable.aurora);
-        images.put(6, R.drawable.clouds_over_himalayas);
+        images.put(6, R.drawable.lake_sunrise);
         images.put(7, R.drawable.fireflies_fall);
         images.put(8, R.drawable.snow_in_dark);
+        images.put(9, R.drawable.highway_cars);
+        images.put(10, R.drawable.foggy_forest);
+        images.put(11, R.drawable.windmill);
+        images.put(12, R.drawable.record_player);
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
@@ -191,11 +195,12 @@ public class CalmifyFragment extends Fragment {
      */
     private void updateUI() {
 
+        String songTitle = mSongs.get(songIndex).getTitle();
+
         // "#song.mp3" -> "song"
-        mSongTitle.setText(
-                mSongs.get(songIndex).getTitle()
-                        .substring(1)               // Remove song #
-                        .replace(".ogg", "")        // Remove file extension
+        mSongTitle.setText(songTitle
+                        .substring(songTitle.indexOf(' '))      // Remove song #
+                        .replace(".ogg", "")                    // Remove file extension
         );
 
         // Image

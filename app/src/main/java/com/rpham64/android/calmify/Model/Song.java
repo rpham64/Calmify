@@ -10,7 +10,7 @@ public class Song {
 
     private final String TAG = "Song";
 
-    private String mAssetPath;      // Uri: "music/filename.ogg"
+    private String mAssetPath;      // Uri: "music/## filename.ogg"
     private String mTitle;
 
     public Song(String assetPath) {
@@ -18,7 +18,7 @@ public class Song {
 
         // Extract file name from asset path
         String[] components = assetPath.split("/");
-        mTitle = components[components.length - 1];         // "#Title.ogg"
+        mTitle = components[components.length - 1];         // "## Title.ogg"
 
         Log.i(TAG, "Title: " + mTitle);
     }
