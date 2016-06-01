@@ -36,7 +36,7 @@ public class SongPlaylist extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_of_songs, container, false);
+        View view = inflater.inflate(R.layout.list_songs_recycler_view, container, false);
 
         mRecyclerView = (RecyclerView)view.findViewById(R.id.list_of_songs_recycler_view);
 
