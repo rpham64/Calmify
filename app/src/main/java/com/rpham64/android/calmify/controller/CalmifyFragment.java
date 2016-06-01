@@ -25,6 +25,8 @@ import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
 /**
+ * Home fragment that houses the MediaPlayer
+ *
  * Created by Rudolf on 5/24/2016.
  */
 public class CalmifyFragment extends Fragment {
@@ -94,10 +96,7 @@ public class CalmifyFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (Build.VERSION.SDK_INT >= 19) {
-            hideStatusAndNavigationBars();
-        }
-
+        if (Build.VERSION.SDK_INT >= 19) hideStatusAndNavigationBars();
     }
 
     private void hideStatusAndNavigationBars() {

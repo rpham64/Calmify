@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Calmify.iml" filepath="$PROJECT_DIR$/Calmify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Libraries/Libraries.iml" filepath="$PROJECT_DIR$/Libraries/Libraries.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Libraries/SlidingMenu/SlidingMenu.iml" filepath="$PROJECT_DIR$/Libraries/SlidingMenu/SlidingMenu.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
