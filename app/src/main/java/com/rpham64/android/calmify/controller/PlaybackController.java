@@ -25,22 +25,12 @@ public class PlaybackController implements Playback {
     private SongsManager mSongsManager;
 
     private List<Song> mSongs;
-    private int songIndex;
 
     public PlaybackController(Context context) {
         mAssets = context.getAssets();
         mMediaPlayer = new MediaPlayer();
         mSongsManager = new SongsManager(context);
         mSongs = mSongsManager.getSongs();
-
-        mMediaPlayer.setLooping(true);
-
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                play(songIndex);
-            }
-        });
     }
 
     /**
@@ -68,10 +58,7 @@ public class PlaybackController implements Playback {
             e.printStackTrace();
         }
 
-        if (isLooping()) {
-            mMediaPlayer.setNextMediaPlayer(mMediaPlayer);
-        }
-
+        mMediaPlayer.setLooping(true);
     }
 
     @Override
