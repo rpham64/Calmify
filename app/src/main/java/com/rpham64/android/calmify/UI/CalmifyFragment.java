@@ -4,10 +4,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
@@ -16,6 +20,7 @@ import com.rpham64.android.calmify.model.ImageManager;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifDrawable;
@@ -37,14 +42,19 @@ public class CalmifyFragment extends Fragment {
     private ImageView mPlay;
     private ImageView mNext;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+
     private PlaybackController mPlayback;
 
     private SongsManager mSongsManager;
     private List<Song> mSongs;
+    private List<String> mTitles;
 
     private ImageManager imageManager;
     private List<Integer> mImages;
 
+    // Current song's position in playlist
     private int songIndex = 0;
 
     public static CalmifyFragment newInstance() {
@@ -60,6 +70,17 @@ public class CalmifyFragment extends Fragment {
 
         mSongsManager = new SongsManager(getActivity());
         mSongs = mSongsManager.getSongs();
+        mTitles = new ArrayList<>(mSongs.size());
+
+        for (Song song : mSongs) {
+
+            // "## song.ogg" -> "song"
+            String title = song.getTitle()
+                    .substring(song.getTitle().indexOf(' ') + 1,
+                            song.getTitle().indexOf('.'));
+
+            mTitles.add(title);
+        }
 
         imageManager = new ImageManager();
         mImages = imageManager.getImages();
@@ -89,6 +110,9 @@ public class CalmifyFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_full_screen_media_player, container, false);
 
+        mDrawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) view.findViewById(R.id.left_drawer);
+
         mBackgroundImage = (GifImageView) view.findViewById(R.id.background_image);
         mTimer = (TextView) view.findViewById(R.id.sleep_timer);
         mSongTitle = (TextView) view.findViewById(R.id.song_title);
@@ -97,6 +121,42 @@ public class CalmifyFragment extends Fragment {
         mNext = (ImageView) view.findViewById(R.id.next);
 
         updateUI();
+
+        /*mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });*/
+
+        // Set adapter for list view
+        mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_song_info, mTitles));
+
+        // Set list's click listener
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                songIndex = position;
+                mDrawerLayout.closeDrawers();
+                play();
+                updateUI();
+            }
+        });
 
         mPrev.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,13 +220,7 @@ public class CalmifyFragment extends Fragment {
     private void updateUI() {
 
         // 1) Display song title
-        String songTitle = mSongs.get(songIndex).getTitle();
-
-        // "## song.ogg" -> "song"
-        mSongTitle.setText(songTitle
-                        .substring(songTitle.indexOf(' ') + 1)      // Remove song #
-                        .replace(".ogg", "")                        // Remove file extension
-        );
+        mSongTitle.setText(mTitles.get(songIndex));
 
         // 2) Display live wallpaper (gif)
 
