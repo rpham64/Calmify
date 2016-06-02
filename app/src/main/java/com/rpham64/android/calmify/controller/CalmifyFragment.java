@@ -14,11 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
+import com.rpham64.android.calmify.model.ImageManager;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifDrawable;
@@ -40,11 +40,12 @@ public class CalmifyFragment extends Fragment {
     private ImageView mPlay;
     private ImageView mNext;
 
-    private HashMap<Integer, Integer> images = new HashMap<>();
-
     private MediaPlayer mMediaPlayer;
 
-    private SongsManager mSongsManager;
+    private ImageManager imageManager;
+    private SongsManager songsManager;
+
+    private List<Integer> mImages;
     private List<Song> mSongs;
     private int songIndex = 0;
 
@@ -57,24 +58,11 @@ public class CalmifyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        // Map songIndex to corresponding gifs
-        // Used for displaying a new live wallpaper for each song
-        images.put(0, R.drawable.coffee);
-        images.put(1, R.drawable.rain);
-        images.put(2, R.drawable.fall);
-        images.put(3, R.drawable.fall_leaves);
-        images.put(4, R.drawable.snow);
-        images.put(5, R.drawable.lake_nature);
-        images.put(6, R.drawable.aurora);
-        images.put(7, R.drawable.lake_sunrise);
-        images.put(8, R.drawable.fireflies_fall);
-        images.put(9, R.drawable.snow_in_dark);
-        images.put(10, R.drawable.foggy_forest);
-        images.put(11, R.drawable.windmill);
-        images.put(12, R.drawable.record_player);
+        imageManager = new ImageManager();
+        songsManager = new SongsManager(getActivity());
 
-        mSongsManager = new SongsManager(getActivity());
-        mSongs = mSongsManager.getSongs();
+        mImages = imageManager.getImages();
+        mSongs = songsManager.getSongs();
 
         mMediaPlayer = new MediaPlayer();
 
@@ -196,14 +184,14 @@ public class CalmifyFragment extends Fragment {
 
         String songTitle = mSongs.get(songIndex).getTitle();
 
-        // "#song.mp3" -> "song"
+        // "## song.ogg" -> "song"
         mSongTitle.setText(songTitle
                         .substring(songTitle.indexOf(' '))      // Remove song #
                         .replace(".ogg", "")                    // Remove file extension
         );
 
         // Image
-        mBackgroundImage.setImageResource(images.get(songIndex));
+        mBackgroundImage.setImageResource(mImages.get(songIndex));
 
         // Gif
         GifDrawable gifDrawable = (GifDrawable) mBackgroundImage.getDrawable();
@@ -219,7 +207,7 @@ public class CalmifyFragment extends Fragment {
 
             String currentSong = mSongs.get(songIndex).getTitle();
 
-            Log.i(TAG, "Now playing: " + currentSong.substring(1));
+            Log.i(TAG, "Now playing: " + currentSong.substring(3, currentSong.length() - 4));
 
             AssetFileDescriptor afd =
                     getActivity().getAssets().openFd("music/" + currentSong);

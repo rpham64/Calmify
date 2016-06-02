@@ -77,7 +77,7 @@ public class SongPlaylist extends Fragment{
             super(itemView);
 
             mTitle = (TextView) itemView.findViewById(R.id.list_song_title);
-            mArtist = (TextView) itemView.findViewById(R.id.list_song_artist);
+//            mArtist = (TextView) itemView.findViewById(R.id.list_song_artist);
 
             itemView.setOnClickListener(this);
         }

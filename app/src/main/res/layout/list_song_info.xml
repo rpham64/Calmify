@@ -4,20 +4,23 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <!-- Song Title -->
     <TextView
         android:id="@+id/list_song_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:padding="4dp"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:padding="16dp"
         tools:text="Song Title"/>
 
-    <TextView
+    <!-- Song Artist -->
+    <!--<TextView
         android:id="@+id/list_song_artist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/list_song_title"
         android:padding="4dp"
-        tools:text="Song Artist"/>
+        tools:text="Song Artist"/>-->
 
 </RelativeLayout>
