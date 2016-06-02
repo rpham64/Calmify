@@ -1,12 +1,9 @@
-package com.rpham64.android.calmify.controller;
+package com.rpham64.android.calmify.ui;
 
-import android.content.res.AssetFileDescriptor;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +11,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
+import com.rpham64.android.calmify.controller.PlaybackController;
 import com.rpham64.android.calmify.model.ImageManager;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
 
-import java.io.IOException;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifDrawable;
@@ -40,13 +37,14 @@ public class CalmifyFragment extends Fragment {
     private ImageView mPlay;
     private ImageView mNext;
 
-    private MediaPlayer mMediaPlayer;
+    private PlaybackController mPlayback;
+
+    private SongsManager mSongsManager;
+    private List<Song> mSongs;
 
     private ImageManager imageManager;
-    private SongsManager songsManager;
-
     private List<Integer> mImages;
-    private List<Song> mSongs;
+
     private int songIndex = 0;
 
     public static CalmifyFragment newInstance() {
@@ -57,27 +55,16 @@ public class CalmifyFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        
+        mPlayback = new PlaybackController(getActivity());
+
+        mSongsManager = new SongsManager(getActivity());
+        mSongs = mSongsManager.getSongs();
 
         imageManager = new ImageManager();
-        songsManager = new SongsManager(getActivity());
-
         mImages = imageManager.getImages();
-        mSongs = songsManager.getSongs();
-
-        mMediaPlayer = new MediaPlayer();
 
         play();
-
-        // TODO: Create a "repeat" button that turns setLooping on/off
-        mMediaPlayer.setLooping(true);
-
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                play();
-            }
-        });
-
     }
 
     @Override
@@ -109,11 +96,6 @@ public class CalmifyFragment extends Fragment {
         mPlay = (ImageView) view.findViewById(R.id.play_pause);
         mNext = (ImageView) view.findViewById(R.id.next);
 
-        // MediaPlayer not playing => Set "play" button
-        if (!mMediaPlayer.isPlaying()) {
-            setPlayButton();
-        }
-
         updateUI();
 
         mPrev.setOnClickListener(new View.OnClickListener() {
@@ -124,10 +106,8 @@ public class CalmifyFragment extends Fragment {
 
                 if (songIndex < 0) songIndex += mSongs.size();
 
-                updateUI();
-                setPausedButton();
-
                 play();
+                updateUI();
             }
         });
 
@@ -135,7 +115,7 @@ public class CalmifyFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (!mMediaPlayer.isPlaying()) {
+                if (!isPlaying()) {
                     setPausedButton();
                     start();
                 } else {
@@ -151,11 +131,8 @@ public class CalmifyFragment extends Fragment {
 
                 songIndex = (songIndex + 1) % mSongs.size();
 
-                updateUI();
-                setPausedButton();
-
                 play();
-
+                updateUI();
             }
         });
 
@@ -182,13 +159,16 @@ public class CalmifyFragment extends Fragment {
      */
     private void updateUI() {
 
+        // 1) Display song title
         String songTitle = mSongs.get(songIndex).getTitle();
 
         // "## song.ogg" -> "song"
         mSongTitle.setText(songTitle
-                        .substring(songTitle.indexOf(' '))      // Remove song #
-                        .replace(".ogg", "")                    // Remove file extension
+                        .substring(songTitle.indexOf(' ') + 1)      // Remove song #
+                        .replace(".ogg", "")                        // Remove file extension
         );
+
+        // 2) Display live wallpaper (gif)
 
         // Image
         mBackgroundImage.setImageResource(mImages.get(songIndex));
@@ -196,47 +176,37 @@ public class CalmifyFragment extends Fragment {
         // Gif
         GifDrawable gifDrawable = (GifDrawable) mBackgroundImage.getDrawable();
         gifDrawable.start();
+
+        // 3) Update play/pause button
+        if (!isPlaying()) {
+            setPlayButton();
+        } else {
+            setPausedButton();
+        }
+
     }
 
-    /**
-     * Plays song at current index in mSongs list
-     */
     private void play() {
-
-        try {
-
-            String currentSong = mSongs.get(songIndex).getTitle();
-
-            Log.i(TAG, "Now playing: " + currentSong.substring(3, currentSong.length() - 4));
-
-            AssetFileDescriptor afd =
-                    getActivity().getAssets().openFd("music/" + currentSong);
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            mMediaPlayer.prepare();
-            start();
-            afd.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (mMediaPlayer.isLooping()) {
-            mMediaPlayer.setNextMediaPlayer(mMediaPlayer);
-        }
-
+        mPlayback.play(songIndex);
     }
 
     private void start() {
-        mMediaPlayer.start();
+        mPlayback.start();
     }
 
     private void pause() {
-        mMediaPlayer.pause();
+        mPlayback.pause();
     }
 
     private void stop() {
-        mMediaPlayer.stop();
+        mPlayback.stop();
     }
 
+    private boolean isPlaying() {
+        return mPlayback.isPlaying();
+    }
+
+    private boolean isLooping() {
+        return mPlayback.isLooping();
+    }
 }
