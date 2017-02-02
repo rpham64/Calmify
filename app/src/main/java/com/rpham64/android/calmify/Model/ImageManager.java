@@ -17,19 +17,17 @@ public class ImageManager {
     public ImageManager() {
         mImages = new ArrayList<>();
 
-        mImages.add(R.drawable.coffee);
-        mImages.add(R.drawable.rain);
-        mImages.add(R.drawable.fall);
+        mImages.add(R.drawable.open_book_fall);
+        mImages.add(R.drawable.flower);
+        mImages.add(R.drawable.misty_plant);
         mImages.add(R.drawable.fall_leaves);
+        mImages.add(R.drawable.sunrise_forest);
         mImages.add(R.drawable.snow);
-        mImages.add(R.drawable.lake_nature);
-        mImages.add(R.drawable.aurora);
-        mImages.add(R.drawable.lake_sunrise);
-        mImages.add(R.drawable.fireflies_fall);
+        mImages.add(R.drawable.sunset2);
+        mImages.add(R.drawable.milky_way);
         mImages.add(R.drawable.snow_in_dark);
         mImages.add(R.drawable.foggy_forest);
-        mImages.add(R.drawable.windmill);
-        mImages.add(R.drawable.record_player);
+        mImages.add(R.drawable.calm_flowing_water);
     }
 
     public List<Integer> getImages() {

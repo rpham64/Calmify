@@ -15,14 +15,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rpham64.android.calmify.R;
-import com.rpham64.android.calmify.controller.PlaybackController;
 import com.rpham64.android.calmify.model.ImageManager;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
+import com.rpham64.android.calmify.ui.playback.PlaybackController;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -33,17 +36,15 @@ import pl.droidsonroids.gif.GifImageView;
  */
 public class CalmifyFragment extends Fragment {
 
-    private static final String TAG = "CalmifyFragment";
+    private static final String TAG = CalmifyFragment.class.getName();
 
-    private GifImageView mBackgroundImage;
-    private TextView mTimer;
-    private TextView mSongTitle;
-    private ImageView mPrev;
-    private ImageView mPlay;
-    private ImageView mNext;
-
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    @BindView(R.id.drawer_layout) DrawerLayout layoutDrawer;
+    @BindView(R.id.left_drawer) ListView listSongs;
+    @BindView(R.id.background_gif) GifImageView gifBackground;
+    @BindView(R.id.song_title) TextView txtSong;
+    @BindView(R.id.play_pause) ImageView btnPlay;
+    @BindView(R.id.prev) ImageView btnPrev;
+    @BindView(R.id.next) ImageView btnNext;
 
     private PlaybackController mPlayback;
 
@@ -55,7 +56,7 @@ public class CalmifyFragment extends Fragment {
     private List<Integer> mImages;
 
     // Current song's position in playlist
-    private int songIndex = 0;
+    private int currentIndex = 0;
 
     public static CalmifyFragment newInstance() {
         return new CalmifyFragment();
@@ -72,27 +73,78 @@ public class CalmifyFragment extends Fragment {
         mSongs = mSongsManager.getSongs();
         mTitles = new ArrayList<>(mSongs.size());
 
+        // Song Titles
         for (Song song : mSongs) {
 
             // "## song.ogg" -> "song"
-            String title = song.getTitle()
-                    .substring(song.getTitle().indexOf(' ') + 1,
-                            song.getTitle().indexOf('.'));
+            String title = song.getTitle().substring(3, song.getTitle().length() - 4);
 
             mTitles.add(title);
         }
 
+        // Gif Images
         imageManager = new ImageManager();
         mImages = imageManager.getImages();
 
         play();
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_full_screen_media_player, container, false);
+        ButterKnife.bind(this, view);
+
+        listSongs.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_song_info, mTitles));
+        listSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentIndex = position;
+                layoutDrawer.closeDrawers();
+            }
+        });
+
+        updateUI();
+
+        return view;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-
         if (Build.VERSION.SDK_INT >= 19) hideStatusAndNavigationBars();
+    }
+
+    @OnClick(R.id.play_pause)
+    public void onPlayPauseClicked() {
+        if (isPlaying()) {
+            pause();
+            setPlayButton();
+        } else {
+            start();
+            setPausedButton();
+        }
+    }
+
+    @OnClick(R.id.prev)
+    public void onPrevClicked() {
+        if (currentIndex == 0) {
+            currentIndex = mSongs.size() - 1;
+        } else {
+            --currentIndex;
+        }
+
+        play();
+        updateUI();
+    }
+
+    @OnClick(R.id.next)
+    public void onNextClicked() {
+        currentIndex = (currentIndex + 1) % mSongs.size();
+
+        play();
+        updateUI();
     }
 
     private void hideStatusAndNavigationBars() {
@@ -104,131 +156,21 @@ public class CalmifyFragment extends Fragment {
         decorView.setSystemUiVisibility(uiOptions);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_full_screen_media_player, container, false);
-
-        mDrawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) view.findViewById(R.id.left_drawer);
-
-        mBackgroundImage = (GifImageView) view.findViewById(R.id.background_image);
-        mTimer = (TextView) view.findViewById(R.id.sleep_timer);
-        mSongTitle = (TextView) view.findViewById(R.id.song_title);
-        mPrev = (ImageView) view.findViewById(R.id.prev);
-        mPlay = (ImageView) view.findViewById(R.id.play_pause);
-        mNext = (ImageView) view.findViewById(R.id.next);
-
-        updateUI();
-
-        /*mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });*/
-
-        // Set adapter for list view
-        mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_song_info, mTitles));
-
-        // Set list's click listener
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                songIndex = position;
-                mDrawerLayout.closeDrawers();
-                play();
-                updateUI();
-            }
-        });
-
-        mPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                songIndex--;
-
-                if (songIndex < 0) songIndex += mSongs.size();
-
-                play();
-                updateUI();
-            }
-        });
-
-        mPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (!isPlaying()) {
-                    setPausedButton();
-                    start();
-                } else {
-                    setPlayButton();
-                    pause();
-                }
-            }
-        });
-
-        mNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                songIndex = (songIndex + 1) % mSongs.size();
-
-                play();
-                updateUI();
-            }
-        });
-
-        return view;
-    }
-
-    /**
-     * Sets play/pause button to PLAY
-     */
-    private void setPlayButton() {
-        mPlay.setImageResource(R.drawable.ic_play_button);
-    }
-
-    /**
-     * Sets play/pause button to PAUSE
-     */
-    private void setPausedButton() {
-        mPlay.setImageResource(R.drawable.ic_pause_button);
-    }
-
     /**
      * Changes title, artist, and background image to current song's
-     *
      */
     private void updateUI() {
 
         // 1) Display song title
-        mSongTitle.setText(mTitles.get(songIndex));
+        txtSong.setText(mTitles.get(currentIndex));
 
         // 2) Display live wallpaper (gif)
 
         // Image
-        mBackgroundImage.setImageResource(mImages.get(songIndex));
+        gifBackground.setImageResource(mImages.get(currentIndex));
 
         // Gif
-        GifDrawable gifDrawable = (GifDrawable) mBackgroundImage.getDrawable();
+        GifDrawable gifDrawable = (GifDrawable) gifBackground.getDrawable();
         gifDrawable.start();
 
         // 3) Update play/pause button
@@ -241,7 +183,7 @@ public class CalmifyFragment extends Fragment {
     }
 
     private void play() {
-        mPlayback.play(songIndex);
+        mPlayback.play(currentIndex);
     }
 
     private void start() {
@@ -262,5 +204,13 @@ public class CalmifyFragment extends Fragment {
 
     private boolean isLooping() {
         return mPlayback.isLooping();
+    }
+
+    private void setPlayButton() {
+        btnPlay.setImageResource(R.drawable.ic_play_button);
+    }
+
+    private void setPausedButton() {
+        btnPlay.setImageResource(R.drawable.ic_pause_button);
     }
 }

@@ -6,106 +6,70 @@
     android:layout_height="match_parent">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/full_page_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fitsSystemWindows="true">
+                    android:fitsSystemWindows="true"
+                    android:background="@android:color/black"
+        >
 
-        <!-- Background Image -->
         <pl.droidsonroids.gif.GifImageView
-            android:id="@+id/background_image"
+            android:id="@+id/background_gif"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:contentDescription="@string/background_image"
             />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <!-- Sleep Timer -->
-            <TextView
-                android:id="@+id/sleep_timer"
-                android:text="TIMER"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/song_title"
-                android:gravity="center"
-                android:layout_alignParentTop="true"
-                android:visibility="invisible"/>
-
-            <!-- Song Title -->
-            <TextView
-                android:id="@+id/song_title"
-                android:text="SONG TITLE"
-                android:fontFamily="sans-serif-thin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_centerInParent="true"
-                android:shadowColor="@android:color/black"
-                android:shadowRadius="25"
-                android:textSize="36sp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white"/>
-
-            <!-- Song Artist -->
-            <!--<TextView
-                android:text="SONG ARTIST"
-                android:id="@+id/song_artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_centerInParent="true"
-                android:fontFamily="sans-serif-light"
-                android:shadowColor="@android:color/black"
-                android:shadowRadius="20"
-                android:textSize="24sp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/gray"/>-->
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/controllers"
-            android:orientation="vertical"
+        <TextView
+            android:id="@+id/song_title"
+            android:text="SONG TITLE"
+            android:fontFamily="sans-serif-thin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_centerInParent="true"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="25"
+            android:textSize="36sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white"
+            />
+
+        <LinearLayout
+            android:id="@+id/playback_controllers"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
             android:layout_alignParentBottom="true"
-            android:visibility="visible">
+            android:gravity="center"
+            >
 
-            <!-- Controls -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center">
+            <ImageView
+                android:id="@+id/prev"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_prev_button"
+                android:contentDescription="@string/prev_song"
+                />
 
-                <ImageView
-                    android:id="@+id/prev"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_prev_button"
-                    android:contentDescription="@string/prev_song"/>
+            <ImageView
+                android:id="@+id/play_pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_pause_button"
+                android:contentDescription="@string/play_pause_song"
+                />
 
-                <ImageView
-                    android:id="@+id/play_pause"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:src="@drawable/ic_pause_button"
-                    android:contentDescription="@string/play_pause_song"/>
-
-                <ImageView
-                    android:id="@+id/next"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_next_button"
-                    android:contentDescription="@string/next_song"/>
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/next"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_next_button"
+                android:contentDescription="@string/next_song"
+                />
 
         </LinearLayout>
 
@@ -119,6 +83,7 @@
               android:choiceMode="singleChoice"
               android:divider="@android:color/transparent"
               android:dividerHeight="0dp"
-              android:background="#ffffff"/>
+              android:background="#ffffff"
+        />
 
 </android.support.v4.widget.DrawerLayout>
