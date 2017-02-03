@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/playback_controllers"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:gravity="center"
+    tools:showIn="@layout/activity_calmify">
+
+    <ImageView
+        android:id="@+id/prev"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight="1"
+        android:src="@mipmap/ic_prev_button"
+        />
+
+    <ImageView
+        android:id="@+id/play_pause"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight="1"
+        android:src="@mipmap/ic_pause_button"
+        />
+
+    <ImageView
+        android:id="@+id/next"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight="1"
+        android:src="@mipmap/ic_next_button"
+        />
+
+</LinearLayout>

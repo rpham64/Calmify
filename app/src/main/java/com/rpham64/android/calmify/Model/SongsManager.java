@@ -14,7 +14,6 @@ import java.util.List;
 public class SongsManager {
 
     private static final String TAG = "SongsManager";
-
     private static final String SONGS_FOLDER = "music";
 
     private AssetManager mAssets;

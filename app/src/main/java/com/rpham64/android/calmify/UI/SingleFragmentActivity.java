@@ -19,7 +19,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     @LayoutRes
     protected int getLayoutResId() {
-        return R.layout.activity_fragment;
+        return R.layout.activity_calmify;
     }
 
     @Override
@@ -31,12 +31,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         // If null, create a new fragment with container fragment_container.xml
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
+        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_view_pager);
 
         if (fragment == null) {
             fragment = createFragment();
             fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
+                    .add(R.id.fragment_view_pager, fragment)
                     .commit();
         }
     }

@@ -43,22 +43,22 @@ public class PlaybackController implements Playback {
 
         try {
 
-            String currentSong = mSongs.get(songIndex).getTitle();
+            String currentSong = mSongs.get(songIndex).getFileName();
 
-            Log.i(TAG, "Now playing: " + currentSong.substring(3, currentSong.length() - 4));
+            Log.i(TAG, "Now playing: " + mSongs.get(songIndex).getTitle());
 
             AssetFileDescriptor afd = mAssets.openFd("music/" + currentSong);
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.prepare();
             start();
             afd.close();
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("Could not play media player.");
         }
-
-        mMediaPlayer.setLooping(true);
     }
 
     @Override

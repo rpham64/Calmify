@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@android:color/black"
+    >
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/background_gif"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/background_image"
+        />
+
+    <TextView
+        android:id="@+id/song_title"
+        android:text="SONG TITLE"
+        android:fontFamily="sans-serif-thin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:shadowColor="@android:color/black"
+        android:shadowRadius="25"
+        android:textSize="36sp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white"
+        />
+
+</RelativeLayout>
