@@ -51,8 +51,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calmify);
         ButterKnife.bind(this);
 
-        Log.i(TAG, "SAnity check: Is viewpager null? " + viewPager);
-
         mPlayback = new PlaybackController(this);
 
         mSongsManager = new SongsManager(this);
@@ -68,10 +66,24 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         }
 
         mPagerAdapter = new SongsPagerAdapter(getSupportFragmentManager(), mSongs, mImages);
-
-        Log.i(TAG, "Is pager adapter null? : " + mPagerAdapter);
-
         viewPager.setAdapter(mPagerAdapter);
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.i(TAG, "Page Position: " + position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         listSongs.setAdapter(new ArrayAdapter<>(this, R.layout.list_song_info, mTitles));
         listSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,13 +126,27 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     @OnClick(R.id.prev)
     public void onPrevClicked() {
-        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+
+        int nextItem = viewPager.getCurrentItem() - 1;
+
+        if (nextItem < 0) {
+            nextItem = mSongs.size() - 1;
+        }
+
+        viewPager.setCurrentItem(nextItem);
         play();
     }
 
     @OnClick(R.id.next)
     public void onNextClicked() {
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+
+        int nextItem = viewPager.getCurrentItem() + 1;
+
+        if (nextItem >= mSongs.size()) {
+            nextItem = 0;
+        }
+
+        viewPager.setCurrentItem(nextItem);
         play();
     }
 

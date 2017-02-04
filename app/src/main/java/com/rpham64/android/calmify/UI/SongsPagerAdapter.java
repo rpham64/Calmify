@@ -2,7 +2,7 @@ package com.rpham64.android.calmify.ui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import com.rpham64.android.calmify.model.Image;
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by Rudolf on 2/3/2017.
  */
 
-public class SongsPagerAdapter extends FragmentStatePagerAdapter {
+public class SongsPagerAdapter extends FragmentPagerAdapter {
 
     private static final String TAG = SongsPagerAdapter.class.getName();
 
@@ -26,6 +26,9 @@ public class SongsPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
         mSongs = new ArrayList<>(songs);
         mImages = new ArrayList<>(images);
+
+        Log.i(TAG, "List of songs: " + mSongs);
+        Log.i(TAG, "List of images: " + mImages);
     }
 
     @Override
