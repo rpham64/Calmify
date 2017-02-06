@@ -51,6 +51,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calmify);
         ButterKnife.bind(this);
 
+        Log.i(TAG, "onCreate");
+
         mPlayback = new PlaybackController(this);
 
         mSongsManager = new SongsManager(this);
@@ -76,7 +78,11 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.i(TAG, "Page Position: " + position);
+//                Log.i(TAG, "Page Position: " + position);
+                stop();
+
+                viewPager.setCurrentItem(position);
+                play();
             }
 
             @Override
@@ -93,6 +99,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
                 layoutDrawer.closeDrawers();
             }
         });
+
+        play();
     }
 
     /**
@@ -109,8 +117,12 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         if (hasFocus && Build.VERSION.SDK_INT >= 19) {
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
+        }
     }
 
     @OnClick(R.id.play_pause)
@@ -152,6 +164,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     private void play() {
         mPlayback.play(viewPager.getCurrentItem());
+        setPausedButton();
     }
 
     private void start() {
@@ -160,6 +173,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     private void pause() {
         mPlayback.pause();
+        setPlayButton();
     }
 
     private void stop() {

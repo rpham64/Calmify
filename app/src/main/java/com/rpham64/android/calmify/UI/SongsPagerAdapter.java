@@ -26,18 +26,10 @@ public class SongsPagerAdapter extends FragmentPagerAdapter {
         super(fm);
         mSongs = new ArrayList<>(songs);
         mImages = new ArrayList<>(images);
-
-        Log.i(TAG, "List of songs: " + mSongs);
-        Log.i(TAG, "List of images: " + mImages);
     }
 
     @Override
     public Fragment getItem(int position) {
-
-        Log.i(TAG, "Song: " + mSongs.get(position));
-        Log.i(TAG, "Image: " + mImages.get(position));
-        Log.i(TAG, "Is null: " + CalmifyFragment.newInstance(mSongs.get(position), mImages.get(position)));
-
         return CalmifyFragment.newInstance(mSongs.get(position), mImages.get(position));
     }
 

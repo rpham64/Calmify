@@ -59,8 +59,6 @@ public class CalmifyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        Log.i(TAG, "onCreate");
-
         if (getArguments() != null) {
             mSong = Parcels.unwrap(getArguments().getParcelable(Extras.song));
             mImage = Parcels.unwrap(getArguments().getParcelable(Extras.image));
@@ -70,8 +68,6 @@ public class CalmifyFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        Log.i(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_calmify, container, false);
         ButterKnife.bind(this, view);
@@ -84,7 +80,7 @@ public class CalmifyFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= 19) hideStatusAndNavigationBars();
+//        if (Build.VERSION.SDK_INT >= 19) hideStatusAndNavigationBars();
     }
 
     /**
@@ -94,17 +90,12 @@ public class CalmifyFragment extends Fragment {
 
         txtSong.setText(mSong.getTitle());
 
-//        gifBackground.setImageResource(mImage.getImage());
-//        GifDrawable gifDrawable = (GifDrawable) gifBackground.getDrawable();
-
         try {
-            GifDrawable gifDrawable1 = new GifDrawable(getResources(), mImage.getImage());
-            gifBackground.setBackground(gifDrawable1);
+            GifDrawable gifDrawable = new GifDrawable(getResources(), mImage.getImage());
+            gifBackground.setImageDrawable(gifDrawable);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        gifDrawable.start();
     }
 
     private void hideStatusAndNavigationBars() {
