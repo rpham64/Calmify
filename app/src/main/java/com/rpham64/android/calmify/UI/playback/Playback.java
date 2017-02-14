@@ -5,16 +5,15 @@ package com.rpham64.android.calmify.ui.playback;
  */
 public interface Playback {
 
-    /**
-     * Plays song at current index in mSongs list
-     */
-    void play(int songIndex);
+    void play();
 
     void start();
 
     void pause();
 
     void stop();
+
+    void release();
 
     boolean isPlaying();
 

@@ -47,6 +47,7 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'org.parceler:parceler-api:1.1.6'
     apt 'org.parceler:parceler:1.1.6'
+    compile 'com.orhanobut:logger:1.15'
 
     // UI
     compile 'com.squareup.picasso:picasso:2.5.2'
