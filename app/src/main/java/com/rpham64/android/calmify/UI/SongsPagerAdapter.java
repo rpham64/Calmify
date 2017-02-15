@@ -32,6 +32,7 @@ public class SongsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
 
         Log.i(TAG, "Position: " + position);
+        Log.i(TAG, "Song: " + mSongs.get(position));
 
         return CalmifyFragment.newInstance(mSongs.get(position), mImages.get(position));
     }
