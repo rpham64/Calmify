@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,7 +43,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     private MusicService mMusicService;
     private Intent mPlayIntent;
-    private boolean mMusicBound = false;        // If Activity is bound to Service
 
     private ServiceConnection mMusicConnection;
 
@@ -60,6 +60,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calmify);
         ButterKnife.bind(this);
+
+        Log.i(TAG, "onCreate");
 
         mSongsManager = new SongsManager(this);
         mSongs = mSongsManager.getSongs();
@@ -107,7 +109,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
                 // Pass list of songs
                 mMusicService.setSongs(mSongs);
-                mMusicBound = true;
 
                 mMusicService.setSong(0);
                 mMusicService.play();
@@ -116,8 +117,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 Logger.d("MusicService disconnected");
-
-                mMusicBound = false;
             }
         };
 
@@ -135,12 +134,31 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
 
         if (mPlayIntent == null) {
             mPlayIntent = new Intent(this, MusicService.class);
             bindService(mPlayIntent, mMusicConnection, Context.BIND_AUTO_CREATE);
             startService(mPlayIntent);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop");
     }
 
     @Override

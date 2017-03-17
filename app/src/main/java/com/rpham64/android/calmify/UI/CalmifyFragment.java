@@ -1,10 +1,8 @@
 package com.rpham64.android.calmify.ui;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,12 +75,6 @@ public class CalmifyFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-//        if (Build.VERSION.SDK_INT >= 19) hideStatusAndNavigationBars();
-    }
-
     /**
      * Changes title, artist, and background image to current song's
      */
@@ -96,14 +88,5 @@ public class CalmifyFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void hideStatusAndNavigationBars() {
-        View decorView = getActivity().getWindow().getDecorView();
-
-        // Hide the status and navigation bars.
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
     }
 }
