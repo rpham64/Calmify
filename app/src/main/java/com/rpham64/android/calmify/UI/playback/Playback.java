@@ -7,8 +7,6 @@ public interface Playback {
 
     void play();
 
-    void start();
-
     void pause();
 
     void stop();

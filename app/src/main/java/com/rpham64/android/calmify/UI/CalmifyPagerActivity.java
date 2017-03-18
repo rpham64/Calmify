@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.orhanobut.logger.Logger;
 import com.rpham64.android.calmify.R;
@@ -45,6 +46,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     private Intent mPlayIntent;
 
     private ServiceConnection mMusicConnection;
+    private boolean mIsServiceBound = false;
 
     private SongsPagerAdapter mPagerAdapter;
 
@@ -106,6 +108,9 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
                 // Get Service
                 mMusicService = binder.getService();
+                mIsServiceBound = true;
+
+                Toast.makeText(getApplicationContext(), "Service bound", Toast.LENGTH_SHORT).show();
 
                 // Pass list of songs
                 mMusicService.setSongs(mSongs);
@@ -117,6 +122,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 Logger.d("MusicService disconnected");
+                mIsServiceBound = false;
             }
         };
 
@@ -142,10 +148,14 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         super.onResume();
         Log.i(TAG, "onResume");
 
-        if (mPlayIntent == null) {
+        if (mPlayIntent == null && !mIsServiceBound) {
             mPlayIntent = new Intent(this, MusicService.class);
-            bindService(mPlayIntent, mMusicConnection, Context.BIND_AUTO_CREATE);
+
+            // Service inactive, so start it
             startService(mPlayIntent);
+            bindService(mPlayIntent, mMusicConnection, Context.BIND_AUTO_CREATE);
+        } else {
+            // Service is already active
         }
     }
 
@@ -163,8 +173,11 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        stopService(mPlayIntent);
-        mMusicService = null;
+        if (mIsServiceBound) {
+            unbindService(mMusicConnection);
+//            stopService(mPlayIntent);
+            mMusicService = null;
+        }
         super.onDestroy();
     }
 
@@ -193,11 +206,9 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     @OnClick(R.id.play_pause)
     public void onPlayPauseClicked() {
         if (isPlaying()) {
-            setPlayButton();
             pause();
         } else {
-            setPausedButton();
-            start();
+            play();
         }
     }
 
@@ -235,10 +246,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     private void play() {
         mMusicService.play();
         setPausedButton();
-    }
-
-    private void start() {
-        mMusicService.start();
     }
 
     private void pause() {

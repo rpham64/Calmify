@@ -66,6 +66,11 @@ dependencies {
     // UiAutomator
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 
+    // Memory Leak Detection
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+
     // Main
     compile 'com.android.support:support-v4:25.3.0'
     compile 'com.android.support:appcompat-v7:25.3.0'
