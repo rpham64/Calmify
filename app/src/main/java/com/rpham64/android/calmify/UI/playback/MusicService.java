@@ -35,6 +35,8 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
     private static final String TAG = MusicService.class.getName();
 
+    private static final int NOTIFICATION_ID = 1;
+
     public interface Extras {
         String ACTION = "MusicService.Extras.ACTION";
         String LIST_SONGS = "MusicService.Extras.LIST_SONGS";
@@ -47,7 +49,14 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
         String SKIP = "MusicService.Actions.SKIP";
     }
 
-    private static final int NOTIFICATION_ID = 1;
+    enum State {
+        Playing,    // Playback active (MediaPlayer ready)
+        Paused,     // Playback paused (MediaPlayer ready)
+        Stopped     // MediaPlayer is stopped and not prepared to play
+    }
+
+    // Current state of MediaPlayer
+    private State mState = State.Stopped;
 
     private AssetManager mAssets;
     private MediaPlayer mMediaPlayer;
@@ -76,14 +85,14 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
         // PLAY, PAUSE, PREV or NEXT
         String action = intent.getStringExtra(Extras.ACTION);
 
+        Log.i(TAG, "Action: " + action);
+
         if (intent.getExtras() != null) {
 
             // Wrap parcelable in activity using Parcels.wrap
             if (mSongs == null) mSongs = Parcels.unwrap(intent.getParcelableExtra(Extras.LIST_SONGS));
 
             mSongIndex = intent.getIntExtra(Extras.SONG_INDEX, 0);
-
-            setupMediaPlayer();
         }
 
         switch (action) {
@@ -105,7 +114,7 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
     private void setupMediaPlayer() {
 
-        createMediaPlayerIfNeeded();
+        relaxResources(false);      // Release everything except mediaplayer
 
         try {
 
@@ -115,7 +124,10 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
             Log.i(TAG, "Now playing: " + mSongTitle);
 
             AssetFileDescriptor afd = mAssets.openFd("music/" + mSong.getFileName());
+            createMediaPlayerIfNeeded();
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            setUpAsForeground(mSongTitle + " (loading)");
             mMediaPlayer.prepareAsync();
             afd.close();
 
@@ -139,7 +151,6 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
             // song is playing, causing playback to stop.
             mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.setOnCompletionListener(this);
             mMediaPlayer.setOnErrorListener(this);
@@ -153,9 +164,12 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
         Logger.d("MusicService: onPrepared");
 
-        mMediaPlayer.setLooping(true);
+        mState = State.Playing;
+
         updateNotification(mSongTitle + " (playing)");
-        mMediaPlayer.start();
+        mMediaPlayer.setLooping(true);
+
+        if (!mediaPlayer.isPlaying()) mMediaPlayer.start();
     }
 
     @Override
@@ -176,7 +190,12 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
     @Override
     public void play() {
-        if (!mMediaPlayer.isPlaying()) {
+
+        if (mState == State.Stopped) {
+            setupMediaPlayer();
+        }
+        else if (mState == State.Paused) {
+            mState = State.Playing;
             setUpAsForeground(mSongTitle + " (playing)");
             mMediaPlayer.start();
         }
@@ -184,7 +203,8 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
     @Override
     public void pause() {
-        if (mMediaPlayer.isPlaying()) {
+        if (mState == State.Playing) {
+            mState = State.Paused;
             mMediaPlayer.pause();
             relaxResources(false);
         }
@@ -192,9 +212,15 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
     @Override
     public void skip() {
-        setupMediaPlayer();
-        setUpAsForeground(mSongTitle + " (playing)");
-        mMediaPlayer.start();
+        if (mState == State.Playing || mState == State.Paused) {
+            setupMediaPlayer();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        relaxResources(true);
     }
 
     @Nullable
@@ -249,7 +275,6 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
         // stop and release the Media Player, if it's available
         if (releaseMediaPlayer && mMediaPlayer != null) {
             mMediaPlayer.reset();
-            mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
         }

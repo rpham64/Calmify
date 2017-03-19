@@ -28,6 +28,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import icepick.Icepick;
+import icepick.State;
 
 public class CalmifyPagerActivity extends AppCompatActivity {
 
@@ -41,27 +43,35 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     private SongsPagerAdapter mPagerAdapter;
 
-    private SongsManager mSongsManager;
     private List<Song> mSongs;
+    private List<Image> mImages;
     private List<String> mTitles;
 
-    private ImageManager mImageManager;
-    private List<Image> mImages;
-    private int mSongIndex = 0;
+    @State int mSongIndex = 0;
+    @State boolean isPlaying = false;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_calmify);
         ButterKnife.bind(this);
 
-        Log.i(TAG, "onCreate");
+        // Set play/pause button on activity re-creation
+        if (isPlaying) {
+            setPausedButton();
+        } else {
+            setPlayButton();
+        }
 
-        mSongsManager = new SongsManager(this);
-        mSongs = mSongsManager.getSongs();
-
-        mImageManager = new ImageManager();
-        mImages = mImageManager.getImages();
+        mSongs = new SongsManager(this).getSongs();
+        mImages = new ImageManager().getImages();
 
         mTitles = new ArrayList<>(mSongs.size());
 
@@ -72,7 +82,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         mPagerAdapter = new SongsPagerAdapter(getSupportFragmentManager(), mSongs, mImages);
         viewPager.setAdapter(mPagerAdapter);
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -80,10 +90,10 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+                Log.i(TAG, "ViewPager position " + position + " selected");
 
-                Log.i(TAG, "Changing page.");
-
-                changeSong(position);
+                // If page selected is a different page, change the song
+                if (mSongIndex != position) changeSong(position);
             }
 
             @Override
@@ -107,6 +117,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
             Log.i(TAG, "Running the service.");
 
             PlaybackUtils.play(this, mSongs, 0);
+            isPlaying = true;
             setPausedButton();
         }
     }
@@ -135,13 +146,15 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     @OnClick(R.id.play)
     public void onPlayClicked() {
-        PlaybackUtils.play(this);
+        PlaybackUtils.play(this, mSongIndex);
+        isPlaying = true;
         setPausedButton();
     }
 
     @OnClick(R.id.pause)
     public void onPauseClicked() {
-        PlaybackUtils.pause(this);
+        PlaybackUtils.pause(this, mSongIndex);
+        isPlaying = false;
         setPlayButton();
     }
 
@@ -166,6 +179,9 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     }
 
     public void changeSong(int position) {
+
+        mSongIndex = position;
+
         // 1) Change background UI
         viewPager.setCurrentItem(position);
 

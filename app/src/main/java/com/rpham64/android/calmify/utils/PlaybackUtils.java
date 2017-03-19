@@ -45,6 +45,13 @@ public class PlaybackUtils {
         context.startService(intent);
     }
 
+    public static void pause(Context context, int songIndex) {
+        Intent intent = new Intent(context, MusicService.class);
+        intent.putExtra(MusicService.Extras.ACTION, MusicService.Actions.PAUSE);
+        intent.putExtra(MusicService.Extras.SONG_INDEX, songIndex);
+        context.startService(intent);
+    }
+
     public static void skip(Context context, int songIndex) {
         Intent intent = new Intent(context, MusicService.class);
         intent.putExtra(MusicService.Extras.ACTION, MusicService.Actions.SKIP);
