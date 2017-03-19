@@ -1,12 +1,9 @@
 package com.rpham64.android.calmify.ui;
 
-import android.content.ComponentName;
+import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -16,15 +13,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.orhanobut.logger.Logger;
 import com.rpham64.android.calmify.R;
 import com.rpham64.android.calmify.model.Image;
 import com.rpham64.android.calmify.model.ImageManager;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.model.SongsManager;
 import com.rpham64.android.calmify.ui.playback.MusicService;
+import com.rpham64.android.calmify.utils.PlaybackUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +36,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     @BindView(R.id.drawer_layout) DrawerLayout layoutDrawer;
     @BindView(R.id.left_drawer) ListView listSongs;
     @BindView(R.id.fragment_view_pager) ViewPager viewPager;
-    @BindView(R.id.play_pause) ImageView btnPlayPause;
-
-    private MusicService mMusicService;
-    private Intent mPlayIntent;
-
-    private ServiceConnection mMusicConnection;
-    private boolean mIsServiceBound = false;
+    @BindView(R.id.play) ImageView btnPlay;
+    @BindView(R.id.pause) ImageView btnPause;
 
     private SongsPagerAdapter mPagerAdapter;
 
@@ -56,6 +47,7 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
     private ImageManager mImageManager;
     private List<Image> mImages;
+    private int mSongIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +80,10 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+
+                Log.i(TAG, "Changing page.");
+
                 changeSong(position);
-                play();
             }
 
             @Override
@@ -98,87 +92,23 @@ public class CalmifyPagerActivity extends AppCompatActivity {
             }
         });
 
-        mMusicConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
-                Logger.d("MusicService connected");
-
-                MusicService.MusicBinder binder = (MusicService.MusicBinder) iBinder;
-
-                // Get Service
-                mMusicService = binder.getService();
-                mIsServiceBound = true;
-
-                Toast.makeText(getApplicationContext(), "Service bound", Toast.LENGTH_SHORT).show();
-
-                // Pass list of songs
-                mMusicService.setSongs(mSongs);
-
-                mMusicService.setSong(0);
-                mMusicService.play();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-                Logger.d("MusicService disconnected");
-                mIsServiceBound = false;
-            }
-        };
-
         listSongs.setAdapter(new ArrayAdapter<>(this, R.layout.list_song_info, mTitles));
         listSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 changeSong(position);
-                play();
                 layoutDrawer.closeDrawers();
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i(TAG, "onStart");
-    }
+        // Start MusicService if not currently active
+        if (!isMyServiceRunning(MusicService.class)) {
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i(TAG, "onResume");
+            Log.i(TAG, "Running the service.");
 
-        if (mPlayIntent == null && !mIsServiceBound) {
-            mPlayIntent = new Intent(this, MusicService.class);
-
-            // Service inactive, so start it
-            startService(mPlayIntent);
-            bindService(mPlayIntent, mMusicConnection, Context.BIND_AUTO_CREATE);
-        } else {
-            // Service is already active
+            PlaybackUtils.play(this, mSongs, 0);
+            setPausedButton();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i(TAG, "onPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i(TAG, "onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mIsServiceBound) {
-            unbindService(mMusicConnection);
-//            stopService(mPlayIntent);
-            mMusicService = null;
-        }
-        super.onDestroy();
     }
 
     /**
@@ -203,73 +133,65 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.play_pause)
-    public void onPlayPauseClicked() {
-        if (isPlaying()) {
-            pause();
-        } else {
-            play();
-        }
+    @OnClick(R.id.play)
+    public void onPlayClicked() {
+        PlaybackUtils.play(this);
+        setPausedButton();
+    }
+
+    @OnClick(R.id.pause)
+    public void onPauseClicked() {
+        PlaybackUtils.pause(this);
+        setPlayButton();
     }
 
     @OnClick(R.id.prev)
     public void onPrevClicked() {
 
-        int nextItem = viewPager.getCurrentItem() - 1;
+        mSongIndex = viewPager.getCurrentItem() - 1;
 
-        if (nextItem < 0) {
-            nextItem = mSongs.size() - 1;
-        }
+        if (mSongIndex < 0) mSongIndex = mSongs.size() - 1;
 
-        changeSong(nextItem);
-        play();
+        changeSong(mSongIndex);
     }
 
     @OnClick(R.id.next)
     public void onNextClicked() {
 
-        int nextItem = viewPager.getCurrentItem() + 1;
+        mSongIndex = viewPager.getCurrentItem() + 1;
 
-        if (nextItem >= mSongs.size()) {
-            nextItem = 0;
-        }
+        if (mSongIndex >= mSongs.size()) mSongIndex = 0;
 
-        changeSong(nextItem);
-        play();
+        changeSong(mSongIndex);
     }
 
-    private void changeSong(int position) {
+    public void changeSong(int position) {
+        // 1) Change background UI
         viewPager.setCurrentItem(position);
-        mMusicService.setSong(position);
-    }
 
-    private void play() {
-        mMusicService.play();
+        // 2) Change song on MusicService
+        PlaybackUtils.skip(this, position);
+
         setPausedButton();
     }
 
-    private void pause() {
-        mMusicService.pause();
-        setPlayButton();
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private void stop() {
-        mMusicService.stop();
+    public void setPlayButton() {
+        btnPlay.setVisibility(View.VISIBLE);
+        btnPause.setVisibility(View.GONE);
     }
 
-    private boolean isPlaying() {
-        return mMusicService.isPlaying();
-    }
-
-    private boolean isLooping() {
-        return mMusicService.isLooping();
-    }
-
-    private void setPlayButton() {
-        btnPlayPause.setImageResource(R.mipmap.ic_play_button);
-    }
-
-    private void setPausedButton() {
-        btnPlayPause.setImageResource(R.mipmap.ic_pause_button);
+    public void setPausedButton() {
+        btnPlay.setVisibility(View.GONE);
+        btnPause.setVisibility(View.VISIBLE);
     }
 }

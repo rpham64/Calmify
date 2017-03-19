@@ -9,11 +9,5 @@ public interface Playback {
 
     void pause();
 
-    void stop();
-
-    void release();
-
-    boolean isPlaying();
-
-    boolean isLooping();
+    void skip();
 }
