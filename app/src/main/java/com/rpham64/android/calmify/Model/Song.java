@@ -2,28 +2,46 @@ package com.rpham64.android.calmify.model;
 
 import android.util.Log;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+import org.parceler.ParcelProperty;
+
 /**
  * Keeps track of song title and any other info related to the song
  *
  */
+@Parcel(Parcel.Serialization.FIELD)
 public class Song {
 
-    private final String TAG = "Song";
+    private static final String TAG = Song.class.getName();
 
-    private String mAssetPath;      // Uri: "music/## filename.ogg"
-    private String mTitle;
+    @ParcelProperty("assetPath")
+    String mAssetPath;
+    String mFileName;
 
-    public Song(String assetPath) {
+    @ParcelConstructor
+    public Song(@ParcelProperty("assetPath") String assetPath) {
         mAssetPath = assetPath;
 
         // Extract file name from asset path
         String[] components = assetPath.split("/");
-        mTitle = components[components.length - 1];         // "## Title.ogg"
+        mFileName = components[components.length - 1];         // "## Title.ogg"
 
-        Log.i(TAG, "Title: " + mTitle);
+        Log.i(TAG, "Filename: " + mFileName);
     }
 
+    @ParcelProperty("filename")
+    public String getFileName() {
+        return mFileName;
+    }
+
+    /**
+     * Returns the title portion of the song filename
+     *
+     * "## title.ogg" -> "title"
+     */
+    @ParcelProperty("title")
     public String getTitle() {
-        return mTitle;
+        return mFileName.substring(3, mFileName.length() - 4);
     }
 }

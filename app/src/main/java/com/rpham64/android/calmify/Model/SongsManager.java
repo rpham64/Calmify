@@ -14,11 +14,10 @@ import java.util.List;
 public class SongsManager {
 
     private static final String TAG = "SongsManager";
-
     private static final String SONGS_FOLDER = "music";
 
     private AssetManager mAssets;
-    private List<Song> mSongs = new ArrayList<>();
+    private List<Song> mSongs;
 
     public SongsManager(Context context) {
         mAssets = context.getAssets();
@@ -27,6 +26,7 @@ public class SongsManager {
 
     private void loadSongs() {
 
+        mSongs = new ArrayList<>();
         String[] songNames;
 
         try {
