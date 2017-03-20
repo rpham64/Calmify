@@ -166,7 +166,7 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
         mState = State.Playing;
 
-        updateNotification(mSongTitle + " (playing)");
+        updateNotification("Now Playing: " + mSongTitle);
         mMediaPlayer.setLooping(true);
 
         if (!mediaPlayer.isPlaying()) mMediaPlayer.start();
@@ -196,7 +196,7 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
         }
         else if (mState == State.Paused) {
             mState = State.Playing;
-            setUpAsForeground(mSongTitle + " (playing)");
+            setUpAsForeground("Now Playing: " + mSongTitle);
             mMediaPlayer.start();
         }
     }
@@ -220,6 +220,7 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mState = State.Stopped;
         relaxResources(true);
     }
 
@@ -241,10 +242,10 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
         // Build the notification object.
         mNotificationBuilder = new Notification.Builder(getApplicationContext())
-                .setSmallIcon(R.mipmap.ic_play_button)
+                .setSmallIcon(R.drawable.ic_music_icon_blue)
                 .setTicker(text)
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle("Calmify Notifications Test")
+//                .setContentTitle("Calmify")
                 .setContentText(text)
                 .setContentIntent(pi)
                 .setOngoing(true);

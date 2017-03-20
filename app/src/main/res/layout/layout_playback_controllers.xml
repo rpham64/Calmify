@@ -26,7 +26,7 @@
 
         <ImageView
             android:id="@+id/play"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:src="@mipmap/ic_play_button"
@@ -35,7 +35,7 @@
 
         <ImageView
             android:id="@+id/pause"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:src="@mipmap/ic_pause_button"

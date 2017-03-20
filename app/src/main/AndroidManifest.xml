@@ -7,7 +7,7 @@
     <application
         android:name=".CalmifyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/calmify_launcher"
+        android:icon="@mipmap/ic_calmify_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">

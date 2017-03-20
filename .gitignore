@@ -6,3 +6,6 @@
 .DS_Store
 /build
 /captures
+app-release.apk
+libs/
+/gradle.properties
