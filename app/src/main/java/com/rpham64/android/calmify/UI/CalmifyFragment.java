@@ -12,8 +12,6 @@ import com.rpham64.android.calmify.R;
 import com.rpham64.android.calmify.model.Image;
 import com.rpham64.android.calmify.model.Song;
 
-import org.parceler.Parcels;
-
 import java.io.IOException;
 
 import butterknife.BindView;
@@ -44,8 +42,8 @@ public class CalmifyFragment extends Fragment {
     public static CalmifyFragment newInstance(Song song, Image image) {
 
         Bundle args = new Bundle();
-        args.putParcelable(Extras.song, Parcels.wrap(song));
-        args.putParcelable(Extras.image, Parcels.wrap(image));
+        args.putParcelable(Extras.song, song);
+        args.putParcelable(Extras.image, image);
 
         CalmifyFragment fragment = new CalmifyFragment();
         fragment.setArguments(args);
@@ -58,8 +56,8 @@ public class CalmifyFragment extends Fragment {
         setRetainInstance(true);
 
         if (getArguments() != null) {
-            mSong = Parcels.unwrap(getArguments().getParcelable(Extras.song));
-            mImage = Parcels.unwrap(getArguments().getParcelable(Extras.image));
+            mSong = getArguments().getParcelable(Extras.song);
+            mImage = getArguments().getParcelable(Extras.image);
         }
     }
 

@@ -2,7 +2,6 @@ package com.rpham64.android.calmify.ui;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -28,12 +27,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import icepick.Icepick;
-import icepick.State;
 
 public class CalmifyPagerActivity extends AppCompatActivity {
 
     private static final String TAG = CalmifyPagerActivity.class.getName();
+
+    public interface SavedItems {
+        String songIndex = "CalmifyPagerActivity.songIndex";
+        String isPlaying = "CalmifyPagerActivity.isPlaying";
+    }
 
     @BindView(R.id.drawer_layout) DrawerLayout layoutDrawer;
     @BindView(R.id.left_drawer) ListView listSongs;
@@ -47,21 +49,26 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     private List<Image> mImages;
     private List<String> mTitles;
 
-    @State int mSongIndex = 0;
-    @State boolean isPlaying = false;
+    private int mSongIndex = 0;
+    private boolean isPlaying = false;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Icepick.saveInstanceState(this, outState);
+        outState.putInt(SavedItems.songIndex, mSongIndex);
+        outState.putBoolean(SavedItems.isPlaying, isPlaying);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_calmify);
         ButterKnife.bind(this);
+
+        if (savedInstanceState != null) {
+            mSongIndex = savedInstanceState.getInt(SavedItems.songIndex);
+            isPlaying = savedInstanceState.getBoolean(SavedItems.isPlaying);
+        }
 
         // Set play/pause button on activity re-creation
         if (isPlaying) {
@@ -90,8 +97,6 @@ public class CalmifyPagerActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.i(TAG, "ViewPager position " + position + " selected");
-
                 // If page selected is a different page, change the song
                 if (mSongIndex != position) changeSong(position);
             }
@@ -122,26 +127,16 @@ public class CalmifyPagerActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Immersive Full-screen Mode
-     *
-     * @param hasFocus
-     */
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-        View decorView = getWindow().getDecorView();
-
-        if (hasFocus && Build.VERSION.SDK_INT >= 19) {
-            decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            );
-        }
+    protected void onResume() {
+        super.onResume();
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        );
     }
 
     @OnClick(R.id.play)
@@ -161,6 +156,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     @OnClick(R.id.prev)
     public void onPrevClicked() {
 
+        Log.i(TAG, "Prev clicked");
+
         mSongIndex = viewPager.getCurrentItem() - 1;
 
         if (mSongIndex < 0) mSongIndex = mSongs.size() - 1;
@@ -171,6 +168,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     @OnClick(R.id.next)
     public void onNextClicked() {
 
+        Log.i(TAG, "Next clicked");
+
         mSongIndex = viewPager.getCurrentItem() + 1;
 
         if (mSongIndex >= mSongs.size()) mSongIndex = 0;
@@ -179,6 +178,8 @@ public class CalmifyPagerActivity extends AppCompatActivity {
     }
 
     public void changeSong(int position) {
+
+        Log.i(TAG, "Changing song");
 
         mSongIndex = position;
 
@@ -199,6 +200,16 @@ public class CalmifyPagerActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    public void setToImmersiveMode() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        );
     }
 
     public void setPlayButton() {

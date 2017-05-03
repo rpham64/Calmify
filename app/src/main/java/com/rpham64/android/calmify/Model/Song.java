@@ -1,26 +1,21 @@
 package com.rpham64.android.calmify.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
-
-import org.parceler.Parcel;
-import org.parceler.ParcelConstructor;
-import org.parceler.ParcelProperty;
 
 /**
  * Keeps track of song title and any other info related to the song
  *
  */
-@Parcel(Parcel.Serialization.FIELD)
-public class Song {
+public class Song implements Parcelable {
 
     private static final String TAG = Song.class.getName();
 
-    @ParcelProperty("assetPath")
     String mAssetPath;
     String mFileName;
 
-    @ParcelConstructor
-    public Song(@ParcelProperty("assetPath") String assetPath) {
+    public Song(String assetPath) {
         mAssetPath = assetPath;
 
         // Extract file name from asset path
@@ -30,7 +25,6 @@ public class Song {
         Log.i(TAG, "Filename: " + mFileName);
     }
 
-    @ParcelProperty("filename")
     public String getFileName() {
         return mFileName;
     }
@@ -40,8 +34,36 @@ public class Song {
      *
      * "## title.ogg" -> "title"
      */
-    @ParcelProperty("title")
     public String getTitle() {
         return mFileName.substring(3, mFileName.length() - 4);
     }
+
+    protected Song(Parcel in) {
+        mAssetPath = in.readString();
+        mFileName = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mAssetPath);
+        dest.writeString(mFileName);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Song> CREATOR = new Parcelable.Creator<Song>() {
+        @Override
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+
+        @Override
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
 }

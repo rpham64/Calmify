@@ -2,12 +2,12 @@ package com.rpham64.android.calmify.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.ui.playback.MusicService;
 
-import org.parceler.Parcels;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ public class PlaybackUtils {
     public static void play(Context context, List<Song> mSongs, int songIndex) {
         Intent intent = new Intent(context, MusicService.class);
         intent.putExtra(MusicService.Extras.ACTION, MusicService.Actions.PLAY);
-        intent.putExtra(MusicService.Extras.LIST_SONGS, Parcels.wrap(mSongs));
+        intent.putParcelableArrayListExtra(MusicService.Extras.LIST_SONGS, new ArrayList<Parcelable>(mSongs));
         intent.putExtra(MusicService.Extras.SONG_INDEX, songIndex);
         context.startService(intent);
     }

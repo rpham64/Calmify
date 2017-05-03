@@ -1,28 +1,51 @@
 package com.rpham64.android.calmify.model;
 
-import org.parceler.Parcel;
-import org.parceler.ParcelConstructor;
-import org.parceler.ParcelProperty;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Rudolf on 2/3/2017.
  */
-@Parcel(Parcel.Serialization.BEAN)
-public class Image {
+public class Image implements Parcelable {
 
-    @ParcelProperty("image")
-    Integer mImage;
+    int mImage;
 
-    @ParcelConstructor
-    public Image(@ParcelProperty("image") Integer image) {
+    public Image(int image) {
         mImage = image;
     }
 
-    public Integer getImage() {
+    public int getImage() {
         return mImage;
     }
 
-    public void setImage(Integer image) {
+    public void setImage(int image) {
         mImage = image;
     }
+
+    protected Image(Parcel in) {
+        mImage = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mImage);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<Image>() {
+        @Override
+        public Image createFromParcel(Parcel in) {
+            return new Image(in);
+        }
+
+        @Override
+        public Image[] newArray(int size) {
+            return new Image[size];
+        }
+    };
 }

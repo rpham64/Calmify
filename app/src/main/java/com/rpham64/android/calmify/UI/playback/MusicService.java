@@ -20,8 +20,6 @@ import com.rpham64.android.calmify.R;
 import com.rpham64.android.calmify.model.Song;
 import com.rpham64.android.calmify.ui.CalmifyPagerActivity;
 
-import org.parceler.Parcels;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -89,8 +87,7 @@ public class MusicService extends Service implements Playback, MediaPlayer.OnPre
 
         if (intent.getExtras() != null) {
 
-            // Wrap parcelable in activity using Parcels.wrap
-            if (mSongs == null) mSongs = Parcels.unwrap(intent.getParcelableExtra(Extras.LIST_SONGS));
+            if (mSongs == null) mSongs = intent.getParcelableArrayListExtra(Extras.LIST_SONGS);
 
             mSongIndex = intent.getIntExtra(Extras.SONG_INDEX, 0);
         }
